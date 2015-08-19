@@ -1,0 +1,27 @@
+#!/bin/bash
+
+if [ $# != 2 ]; then
+	echo "Usage: NETXSetup netX tunX"
+	exit 1
+else
+	if [ "$1" == "netb" ]; then
+		TUN="10.0.5.0"
+		NET="192.168.2.0"
+	elif [ "$1" == "netc" ]; then
+		TUN="10.0.6.0"
+                NET="192.168.3.0"
+	else
+		echo "Invalid net: $1"
+		echo "Current valid net: netb, netc"
+		exit 1
+	fi
+
+	ip addr add 10.0.4.1/24 dev $2
+	ifconfig $2 up
+	route add -net $TUN netmask 255.255.255.0 dev $2
+
+	sysctl net.ipv4.ip_forward=1
+	route add -net $NET netmask 255.255.255.0 gw 192.168.1.1
+	route add -net $NET netmask 255.255.255.0 dev $2
+fi
+
